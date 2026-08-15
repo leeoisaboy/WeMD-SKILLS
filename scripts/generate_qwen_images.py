@@ -62,7 +62,8 @@ def main():
         "Content-Type": "application/json",
     }
     response = requests.post(args.endpoint, headers=headers, json=payload, timeout=300)
-    response.raise_for_status()
+    if response.status_code != 200:
+        raise SystemExit(f"HTTP {response.status_code}: {response.text[:1000]}")
     data = response.json()
     if data.get("code"):
         raise SystemExit(f"API error: {data['code']} - {data.get('message', '')}")

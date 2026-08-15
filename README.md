@@ -2,7 +2,7 @@
 
 为 WeMD / 微信公众号 Markdown 文章生成中文配图，并自动上传到 `img.wemd.app` 图床的 Codex skill。
 
-默认使用阿里云百炼 Qwen Image 3.0 文生图，火山引擎 Seedream 5.0 作为备用；同时保留 HTML 透明概念图渲染器，用于需要精确文字排版的图表。
+默认使用阿里云百炼 Qwen Image 3.0 文生图，火山引擎 Seedream 5.0 作为第一备用；HTML 透明概念图渲染器只作为最后兜底，仅在 Qwen 与 Seedream 都不可用时使用。
 
 ## 致谢与参考
 
@@ -13,7 +13,7 @@
 - 中文文生图：`qwen-image-3.0` 主用，`doubao-seedream-5-0-260128` 备用
 - 图床上传：自动上传 `img.wemd.app` 并替换 Markdown 中的本地图片路径
 - 按周归档：每期插图保存到 `weekX.Y/` 子文件夹，方便管理
-- HTML 透明图渲染：适合需要精确文字排版的流程图表
+- HTML 透明图渲染（最后兜底）：仅在 Qwen 与 Seedream 都失败或不可用时使用
 
 ## 公众号
 
@@ -33,7 +33,7 @@ WeMD-SKILLS/
 ├── scripts/
 │   ├── generate_qwen_images.py      # Qwen Image 3.0 文生图
 │   ├── generate_seedream_images.py  # Seedream 5.0 备用生图
-│   ├── render_html_diagrams.py      # HTML 透明概念图渲染
+│   ├── render_html_diagrams.py      # HTML 透明概念图渲染（最后兜底）
 │   └── upload_wemd_images.py        # 上传 img.wemd.app 并替换链接
 ├── requirements.txt
 ├── .gitignore
@@ -83,7 +83,17 @@ python scripts/generate_seedream_images.py \
   --response-format b64_json
 ```
 
-### 4. 上传到 img.wemd.app
+### 4. HTML 兜底（最后手段）
+
+仅在 Qwen 与 Seedream 都失败或不可用时使用：
+
+```bash
+python scripts/render_html_diagrams.py \
+  --html <article-dir>/<week-slug>/<week-slug>_concept_diagrams.html \
+  --out-dir <article-dir>/<week-slug>
+```
+
+### 5. 上传到 img.wemd.app
 
 在 Markdown 中使用子文件夹路径引用图片：
 

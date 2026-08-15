@@ -1,0 +1,4 @@
+interface:
+  display_name: "WeMD Article Diagrams"
+  short_description: "Qwen Image 3.0 Chinese illustrations and img.wemd.app uploads"
+  default_prompt: "Generate Chinese article illustrations with Alibaba Cloud Qwen Image 3.0 (Seedream 5.0 as fallback), save them into per-week folders, and upload them to img.wemd.app for WeMD articles."

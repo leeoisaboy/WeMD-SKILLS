@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.env
+.env.*
+!.env.example
+wemd_upload_cache.json
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.gif
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

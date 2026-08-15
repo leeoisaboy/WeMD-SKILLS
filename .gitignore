@@ -6,6 +6,7 @@ __pycache__/
 !.env.example
 wemd_upload_cache.json
 *.png
+!assets/公众号图片.png
 *.jpg
 *.jpeg
 *.webp

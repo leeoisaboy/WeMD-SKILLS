@@ -4,6 +4,8 @@
 
 默认使用阿里云百炼 Qwen Image 3.0 文生图，火山引擎 Seedream 5.0 作为第一备用；HTML 透明概念图渲染器只作为最后兜底，仅在 Qwen 与 Seedream 都不可用时使用。
 
+同时支持阿里云百炼 HappyHorse 1.1 T2V 生成 30 秒开场视频，自动拆分为两段 15 秒视频并用 ffmpeg 拼接，插入公众号文章开头。
+
 ## 致谢与参考
 
 本项目的 WeMD 配图工作流配套使用 [tenngoxars/WeMD](https://github.com/tenngoxars/WeMD)，这是一个开源的微信公众号 Markdown 编辑与发布工具。安装本 skill 后，可以先用 WeMD 编辑文章，再用本 skill 生成并上传配图。
@@ -11,6 +13,7 @@
 ## 功能
 
 - 中文文生图：`qwen-image-3.0` 主用，`doubao-seedream-5-0-260128` 备用
+- 30 秒开场视频：`happyhorse-1.1-t2v` 生成，两段 15 秒自动拼接
 - 图床上传：自动上传 `img.wemd.app` 并替换 Markdown 中的本地图片路径
 - 按周归档：每期插图保存到 `weekX.Y/` 子文件夹，方便管理
 - HTML 透明图渲染（最后兜底）：仅在 Qwen 与 Seedream 都失败或不可用时使用
@@ -33,6 +36,7 @@ WeMD-SKILLS/
 ├── assets/
 │   └── week3_concept_diagrams.html
 ├── scripts/
+│   ├── generate_article_videos.py # HappyHorse 1.1 T2V 30 秒开场视频
 │   ├── generate_qwen_images.py      # Qwen Image 3.0 文生图
 │   ├── generate_seedream_images.py  # Seedream 5.0 备用生图
 │   ├── render_html_diagrams.py      # HTML 透明概念图渲染（最后兜底）
@@ -54,6 +58,8 @@ WeMD-SKILLS/
    pip install -r requirements.txt
    ```
 
+   生成 30 秒视频还需要本机安装 `ffmpeg`，用于拼接两段 15 秒视频。
+
 ## 使用
 
 ### 1. 配置 API Key
@@ -63,7 +69,23 @@ $env:DASHSCOPE_API_KEY = "你的百炼 Key"   # Qwen 主用
 $env:ARK_API_KEY = "你的火山 Ark Key"      # Seedream 备用
 ```
 
-### 2. Qwen Image 3.0 生图
+### 2. HappyHorse 1.1 T2V 生成 30 秒开场视频
+
+```bash
+python scripts/generate_article_videos.py \
+  --prompt "<整体视频描述>" \
+  --prompt-part-1 "<第1段15秒分镜>" \
+  --prompt-part-2 "<第2段15秒分镜>" \
+  --out-dir <article-dir>/<week-slug> \
+  --name-prefix <week-slug>_opening \
+  --duration 30 \
+  --resolution 720P \
+  --ratio 16:9
+```
+
+生成后在文章开头插入 `<video>` 预览块，发布到公众号时再到公众号后台插入正式视频。
+
+### 3. Qwen Image 3.0 生图
 
 ```bash
 python scripts/generate_qwen_images.py \
@@ -74,7 +96,7 @@ python scripts/generate_qwen_images.py \
   --size 1792*1024
 ```
 
-### 3. Seedream 5.0 备用生图
+### 4. Seedream 5.0 备用生图
 
 ```bash
 python scripts/generate_seedream_images.py \
@@ -85,7 +107,7 @@ python scripts/generate_seedream_images.py \
   --response-format b64_json
 ```
 
-### 4. HTML 兜底（最后手段）
+### 5. HTML 兜底（最后手段）
 
 仅在 Qwen 与 Seedream 都失败或不可用时使用：
 
@@ -95,7 +117,7 @@ python scripts/render_html_diagrams.py \
   --out-dir <article-dir>/<week-slug>
 ```
 
-### 5. 上传到 img.wemd.app
+### 6. 上传到 img.wemd.app
 
 在 Markdown 中使用子文件夹路径引用图片：
 

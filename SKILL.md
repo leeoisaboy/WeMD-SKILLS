@@ -1,25 +1,25 @@
 ---
 name: wemd-article-diagrams
-description: Create Chinese illustrations and 30-second opening videos for WeChat/WeMD markdown articles with Alibaba Cloud Qwen Image 3.0 and HappyHorse 1.1 T2V, Seedream 5.0 as the first image fallback, and HTML diagrams only as the last resort. Save media into per-week folders, upload images to the official img.wemd.app image host, replace local image paths with https://img.wemd.app/... URLs, and place generated videos at the top of the article. Use when generating article illustrations, concept images, or opening videos for WeMD/WeChat articles, including multi-image coherent illustration sets.
+description: Create Chinese illustrations and 15-second opening videos for WeChat/WeMD markdown articles with Alibaba Cloud Qwen Image 3.0 and HappyHorse 1.1 T2V, Seedream 5.0 as the first image fallback, and HTML diagrams only as the last resort. Save media into per-week folders, upload images to the official img.wemd.app image host, replace local image paths with https://img.wemd.app/... URLs, and place generated videos at the top of the article. Use when generating article illustrations, concept images, or opening videos for WeMD/WeChat articles, including multi-image coherent illustration sets.
 ---
 
 # WeMD Article Diagrams
 
 ## Workflow
 
-1. Generate the 30-second opening video with Alibaba Cloud HappyHorse 1.1 T2V:
+1. Generate the 15-second opening video with Alibaba Cloud HappyHorse 1.1 T2V:
 
    ```bash
    python scripts/generate_article_videos.py \
-     --prompt "<30秒开场视频分镜描述>" \
+     --prompt "<15秒片头分镜描述>" \
      --out-dir <article-dir>/<week-slug> \
      --name-prefix <week-slug>_opening \
-     --duration 30 \
+     --duration 15 \
      --resolution 720P \
      --ratio 16:9
    ```
 
-   It submits async tasks to the DashScope endpoint with the same API key as Qwen (service path `.../api/v1/services/aigc/video-generation/video-synthesis`). HappyHorse accepts at most 15 seconds per clip, so a 30-second request is generated as two 15-second clips and concatenated with ffmpeg into `<week-slug>_opening.mp4` in the week subfolder. For a two-clip 30s video, pass `--prompt-part-1` and `--prompt-part-2` so the halves tell one continuous story instead of duplicating the whole prompt. The video prompt should reuse the same visual style as the issue's illustrations. Then insert the video block at the very top of the article, above the title:
+   It submits one async task to the DashScope endpoint with the same API key as Qwen (service path `.../api/v1/services/aigc/video-generation/video-synthesis`) and saves `<week-slug>_opening.mp4` in the week subfolder. The 15 seconds is the article's title sequence, like a movie opening: start with a visual hook, dramatize the article's core message through vivid motion, and end by landing on the theme. Use few words and strong images, and keep the same visual style as the issue's illustrations. Then insert the video block at the very top of the article, above the title:
 
    ```html
    <video controls preload="metadata" poster="week5.2/week5.2.1.png" width="100%">
@@ -76,14 +76,15 @@ description: Create Chinese illustrations and 30-second opening videos for WeCha
 - Each issue must use a different illustration background style to avoid reader aesthetic fatigue. Before generating, pick a new visual style for the week, append a fixed style suffix to every image prompt in that set, and record the style in `## Per-issue visual style`.
 - Qwen Image 3.0 reads its API key from `DASHSCOPE_API_KEY` or `--api-key`. The default public endpoint is `https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation`; if you use a dedicated Model Studio workspace, replace the host with your workspace endpoint and keep the key out of the repository.
 - HappyHorse video generation uses the same DashScope API key as Qwen and the async service path: `https://dashscope.aliyuncs.com/api/v1/services/aigc/video-generation/video-synthesis`. The request must include `X-DashScope-Async: enable`; the script then polls `.../api/v1/tasks/{task_id}` and downloads each finished MP4 before the temporary result URL expires.
-- HappyHorse defaults in `generate_article_videos.py`: model `happyhorse-1.1-t2v`, `duration=30`, `resolution=720P`, `ratio=16:9`, `watermark=false`. HappyHorse accepts 3-15 seconds per clip, so the script splits requests longer than 15 seconds into clips and concatenates them with ffmpeg. `--keep-clips` keeps the individual clip files; otherwise they are removed after concatenation.
+- HappyHorse defaults in `generate_article_videos.py`: model `happyhorse-1.1-t2v`, `duration=15`, `resolution=720P`, `ratio=16:9`, `watermark=false`. HappyHorse accepts 3-15 seconds; keep every article opening video at 15 seconds and design it as a movie-style title sequence.
 - The official `api.wemd.app/upload` service accepts images only, so keep the MP4 local and preview it with the `<video>` block above. WeChat article bodies cannot embed an arbitrary MP4 URL directly; when publishing, upload the generated MP4 in the WeChat public account editor and replace the preview block with the editor-inserted video.
+- Qwen API Key is read from the `DASHSCOPE_API_KEY` environment variable by default; `generate_qwen_images.py` also accepts `--api-key` for a one-off override. Do not hardcode the key in prompts or scripts.
 - Default Qwen request settings: model `qwen-image-3.0`, `size=1024*1024`, `watermark=false`, `prompt_extend=true`, HTTP sync endpoint `https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation`. If you use a dedicated Model Studio workspace, replace the host with your workspace endpoint and keep the key out of the repository.
 - Seedream fallback uses `ARK_API_KEY`; default settings are model `doubao-seedream-5-0-260128`, `size=2K`, `response_format=b64_json`, `stream=true`, `watermark=true`.
 - The HTML-based transparent diagram renderer at `scripts/render_html_diagrams.py` is the last-resort fallback. Use it only after Qwen Image 3.0 and Seedream 5.0 both fail or are unavailable; it is not a normal alternative to the image APIs.
 - WeMD only displays images with `https://img.wemd.app/...` URLs; local relative paths render blank.
 - Upload response shape: `{"success": true, "url": "...", "filename": "..."}`.
-- Dependencies: Python, `requests`, and ffmpeg (required to concatenate the two 15-second video clips into 30 seconds); `openai>=1.0` is only needed for the Seedream fallback. Chrome or Edge are no longer required.
+- Dependencies: Python and `requests`; `openai>=1.0` is only needed for the Seedream fallback. Chrome or Edge are no longer required.
 - Keep all local PNGs for one article in its own week subfolder, e.g. `week3.3/`; never render them flat into the article folder.
 - Keep the opening MP4 in the same week subfolder as the images, e.g. `week5.2/week5.2_opening.mp4`.
 - The upload cache `wemd_upload_cache.json` stays next to the markdown and reuses already-uploaded URLs.

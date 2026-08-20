@@ -4,7 +4,7 @@
 
 默认使用阿里云百炼 Qwen Image 3.0 文生图，火山引擎 Seedream 5.0 作为第一备用；HTML 透明概念图渲染器只作为最后兜底，仅在 Qwen 与 Seedream 都不可用时使用。
 
-同时支持阿里云百炼 HappyHorse 1.1 T2V 生成 15 秒文章片头视频，像电影开场一样形象地演绎整篇文章的核心内容，并插入公众号文章开头。
+同时支持 MiniMax H3 生成 15 秒文章片头视频，像电影开场一样形象地演绎整篇文章的核心内容，并插入公众号文章开头；阿里云百炼 HappyHorse 1.1 T2V 作为视频生成的备用方案。
 
 ## 致谢与参考
 
@@ -13,7 +13,7 @@
 ## 功能
 
 - 中文文生图：`qwen-image-3.0` 主用，`doubao-seedream-5-0-260128` 备用
-- 15 秒文章片头：`happyhorse-1.1-t2v` 单段生成，电影式开场演绎全文核心
+- 15 秒文章片头：`MiniMax-H3` 768P 主用，`happyhorse-1.1-t2v` 备用，电影式开场演绎全文核心
 - 图床上传：自动上传 `img.wemd.app` 并替换 Markdown 中的本地图片路径
 - 按周归档：每期插图保存到 `weekX.Y/` 子文件夹，方便管理
 - HTML 透明图渲染（最后兜底）：仅在 Qwen 与 Seedream 都失败或不可用时使用
@@ -36,7 +36,7 @@ WeMD-SKILLS/
 ├── assets/
 │   └── week3_concept_diagrams.html
 ├── scripts/
-│   ├── generate_article_videos.py # HappyHorse 1.1 T2V 15 秒文章片头
+│   ├── generate_article_videos.py # MiniMax H3 主用，HappyHorse 备用的 15 秒文章片头
 │   ├── generate_qwen_images.py      # Qwen Image 3.0 文生图
 │   ├── generate_seedream_images.py  # Seedream 5.0 备用生图
 │   ├── render_html_diagrams.py      # HTML 透明概念图渲染（最后兜底）
@@ -64,11 +64,12 @@ WeMD-SKILLS/
 ### 1. 配置 API Key
 
 ```powershell
+$env:MINIMAX_API_KEY = "你的 MiniMax Key"   # MiniMax H3 主用
 $env:DASHSCOPE_API_KEY = "你的百炼 Key"   # Qwen 主用
 $env:ARK_API_KEY = "你的火山 Ark Key"      # Seedream 备用
 ```
 
-### 2. HappyHorse 1.1 T2V 生成 15 秒文章片头
+### 2. MiniMax H3 生成 15 秒文章片头
 
 ```bash
 python scripts/generate_article_videos.py \
@@ -76,9 +77,11 @@ python scripts/generate_article_videos.py \
   --out-dir <article-dir>/<week-slug> \
   --name-prefix <week-slug>_opening \
   --duration 15 \
-  --resolution 720P \
+  --resolution 768P \
   --ratio 16:9
 ```
+
+MiniMax 失败或不可用时，脚本会自动回退到 HappyHorse（`--provider happyhorse --resolution 720P`）。
 
 生成后在文章开头插入 `<video>` 预览块，发布到公众号时再到公众号后台插入正式视频。
 

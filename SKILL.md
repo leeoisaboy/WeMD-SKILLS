@@ -1,13 +1,13 @@
 ---
 name: wemd-article-diagrams
-description: Create Chinese illustrations and 15-second opening videos for WeChat/WeMD markdown articles with Alibaba Cloud Qwen Image 3.0 and HappyHorse 1.1 T2V, Seedream 5.0 as the first image fallback, and HTML diagrams only as the last resort. Save media into per-week folders, upload images to the official img.wemd.app image host, replace local image paths with https://img.wemd.app/... URLs, and place generated videos at the top of the article. Use when generating article illustrations, concept images, or opening videos for WeMD/WeChat articles, including multi-image coherent illustration sets.
+description: Create Chinese illustrations and 15-second opening videos for WeChat/WeMD markdown articles with Alibaba Cloud Qwen Image 3.0, MiniMax H3 as the primary video model, HappyHorse 1.1 T2V as the video fallback, Seedream 5.0 as the first image fallback, and HTML diagrams only as the last resort. Save media into per-week folders, upload images to the official img.wemd.app image host, replace local image paths with https://img.wemd.app/... URLs, and place generated videos at the top of the article. Use when generating article illustrations, concept images, or opening videos for WeMD/WeChat articles, including multi-image coherent illustration sets.
 ---
 
 # WeMD Article Diagrams
 
 ## Workflow
 
-1. Generate the 15-second opening video with Alibaba Cloud HappyHorse 1.1 T2V:
+1. Generate the 15-second opening video with MiniMax H3 at 768P (the 0.50 元/秒 option):
 
    ```bash
    python scripts/generate_article_videos.py \
@@ -15,11 +15,11 @@ description: Create Chinese illustrations and 15-second opening videos for WeCha
      --out-dir <article-dir>/<week-slug> \
      --name-prefix <week-slug>_opening \
      --duration 15 \
-     --resolution 720P \
+     --resolution 768P \
      --ratio 16:9
    ```
 
-   It submits one async task to the DashScope endpoint with the same API key as Qwen (service path `.../api/v1/services/aigc/video-generation/video-synthesis`) and saves `<week-slug>_opening.mp4` in the week subfolder. The 15 seconds is the article's title sequence, like a movie opening: start with a visual hook, dramatize the article's core message through vivid motion, and end by landing on the theme. Use few words and strong images, and keep the same visual style as the issue's illustrations. Then insert the video block at the very top of the article, above the title:
+   It submits one async task to `https://api.minimaxi.com/v2/video_generation` with model `MiniMax-H3` and saves `<week-slug>_opening.mp4` in the week subfolder. The script polls the task and downloads the finished MP4 automatically; if MiniMax fails, it retries with HappyHorse 1.1 T2V (`--provider happyhorse --resolution 720P`) unless `--no-fallback` is passed. The 15 seconds is the article's title sequence, like a movie opening: start with a visual hook, dramatize the article's core message through vivid motion, and end by landing on the theme. Use few words and strong images, and keep the same visual style as the issue's illustrations. Then insert the video block at the very top of the article, above the title:
 
    ```html
    <video controls preload="metadata" poster="week5.2/week5.2.1.png" width="100%">
@@ -75,8 +75,9 @@ description: Create Chinese illustrations and 15-second opening videos for WeCha
 - Illustration prompts must only use content already present in the article text. Never introduce company-confidential specifics (such as exact dialects, internal product names, or unpublicized hotwords) just because they appear in conversation or earlier drafts; if the article says "方言热词", the image must say "方言热词".
 - Each issue must use a different illustration background style to avoid reader aesthetic fatigue. Before generating, pick a new visual style for the week, append a fixed style suffix to every image prompt in that set, and record the style in `## Per-issue visual style`.
 - Qwen Image 3.0 reads its API key from `DASHSCOPE_API_KEY` or `--api-key`. The default public endpoint is `https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation`; if you use a dedicated Model Studio workspace, replace the host with your workspace endpoint and keep the key out of the repository.
-- HappyHorse video generation uses the same DashScope API key as Qwen and the async service path: `https://dashscope.aliyuncs.com/api/v1/services/aigc/video-generation/video-synthesis`. The request must include `X-DashScope-Async: enable`; the script then polls `.../api/v1/tasks/{task_id}` and downloads each finished MP4 before the temporary result URL expires.
-- HappyHorse defaults in `generate_article_videos.py`: model `happyhorse-1.1-t2v`, `duration=15`, `resolution=720P`, `ratio=16:9`, `watermark=false`. HappyHorse accepts 3-15 seconds; keep every article opening video at 15 seconds and design it as a movie-style title sequence.
+- MiniMax H3 is the primary video provider. `generate_article_videos.py` defaults to model `MiniMax-H3`, `duration=15`, `resolution=768P` (0.50 元/秒), `ratio=16:9`, `aigc_watermark=false`. MiniMax accepts 4-15 seconds and supports text-to-video ratios `21:9`, `16:9`, `4:3`, `1:1`, `3:4`, `9:16`; text-only generation requires an explicit `ratio`. The async flow is POST `https://api.minimaxi.com/v2/video_generation`, then poll `https://api.minimaxi.com/v2/query/video_generation/{task_id}`; on `status=succeeded`, download `task.content.url` before the temporary URL expires.
+- MiniMax API key is read from the `MINIMAX_API_KEY` environment variable by default; `generate_article_videos.py` also accepts `--api-key`. Do not hardcode the key into this skill, the scripts, or prompts.
+- HappyHorse 1.1 T2V is the video fallback and uses the same DashScope API key as Qwen with the async service path: `https://dashscope.aliyuncs.com/api/v1/services/aigc/video-generation/video-synthesis`. The request must include `X-DashScope-Async: enable`; the script then polls `.../api/v1/tasks/{task_id}` and downloads each finished MP4 before the temporary result URL expires. Run it explicitly with `--provider happyhorse --resolution 720P` (defaults: model `happyhorse-1.1-t2v`, `duration=15`, `ratio=16:9`, `watermark=false`). HappyHorse accepts 3-15 seconds; keep every article opening video at 15 seconds and design it as a movie-style title sequence.
 - The official `api.wemd.app/upload` service accepts images only, so keep the MP4 local and preview it with the `<video>` block above. WeChat article bodies cannot embed an arbitrary MP4 URL directly; when publishing, upload the generated MP4 in the WeChat public account editor and replace the preview block with the editor-inserted video.
 - Qwen API Key is read from the `DASHSCOPE_API_KEY` environment variable by default; `generate_qwen_images.py` also accepts `--api-key` for a one-off override. Do not hardcode the key in prompts or scripts.
 - Default Qwen request settings: model `qwen-image-3.0`, `size=1024*1024`, `watermark=false`, `prompt_extend=true`, HTTP sync endpoint `https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation`. If you use a dedicated Model Studio workspace, replace the host with your workspace endpoint and keep the key out of the repository.

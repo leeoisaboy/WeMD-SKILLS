@@ -6,6 +6,8 @@
 
 同时支持 MiniMax H3 生成 15 秒文章片头视频，像电影开场一样形象地演绎整篇文章的核心内容，并插入公众号文章开头；阿里云百炼 HappyHorse 1.1 T2V 作为视频生成的备用方案。
 
+每期还会生成一张 2.35:1 的微信推送封面：画风每期不同，内容统一是一位人物面对电脑思考，优先使用赛博科技感设定。
+
 ## 致谢与参考
 
 本项目的 WeMD 配图工作流配套使用 [tenngoxars/WeMD](https://github.com/tenngoxars/WeMD)，这是一个开源的微信公众号 Markdown 编辑与发布工具。安装本 skill 后，可以先用 WeMD 编辑文章，再用本 skill 生成并上传配图。
@@ -14,6 +16,7 @@
 
 - 中文文生图：`qwen-image-3.0` 主用，`doubao-seedream-5-0-260128` 备用
 - 15 秒文章片头：`MiniMax-H3` 768P 主用，`happyhorse-1.1-t2v` 备用，电影式开场演绎全文核心
+- 2.35:1 推送封面：每期不同画风，人物面对电脑思考，赛博科技感优先
 - 图床上传：自动上传 `img.wemd.app` 并替换 Markdown 中的本地图片路径
 - 按周归档：每期插图保存到 `weekX.Y/` 子文件夹，方便管理
 - HTML 透明图渲染（最后兜底）：仅在 Qwen 与 Seedream 都失败或不可用时使用
@@ -130,6 +133,19 @@ python scripts/render_html_diagrams.py \
 ```bash
 python scripts/upload_wemd_images.py week4.2.md
 ```
+
+### 7. 微信推送封面（2.35:1）
+
+```bash
+python scripts/generate_qwen_images.py \
+  --prompt "<封面描述>" \
+  --out-dir <article-dir>/<week-slug> \
+  --name-prefix <week-slug>_cover \
+  --index 1 \
+  --size 1692*720
+```
+
+生成后把 `<week-slug>_cover.1.png` 改名为 `<week-slug>_cover.png`，在公众号后台作为封面图上传。封面画风每期不同，具体风格记录在 `SKILL.md` 的 `## Per-issue cover style`。
 
 ## 安全提示
 

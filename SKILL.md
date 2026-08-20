@@ -1,6 +1,6 @@
 ---
 name: wemd-article-diagrams
-description: Create Chinese illustrations and 15-second opening videos for WeChat/WeMD markdown articles with Alibaba Cloud Qwen Image 3.0, MiniMax H3 as the primary video model, HappyHorse 1.1 T2V as the video fallback, Seedream 5.0 as the first image fallback, and HTML diagrams only as the last resort. Save media into per-week folders, upload images to the official img.wemd.app image host, replace local image paths with https://img.wemd.app/... URLs, and place generated videos at the top of the article. Use when generating article illustrations, concept images, or opening videos for WeMD/WeChat articles, including multi-image coherent illustration sets.
+description: Create Chinese illustrations, per-issue 2.35:1 WeChat cover images, and 15-second opening videos for WeChat/WeMD markdown articles with Alibaba Cloud Qwen Image 3.0, MiniMax H3 as the primary video model, HappyHorse 1.1 T2V as the video fallback, Seedream 5.0 as the first image fallback, and HTML diagrams only as the last resort. Save media into per-week folders, upload images to the official img.wemd.app image host, replace local image paths with https://img.wemd.app/... URLs, and place generated videos at the top of the article. Use when generating article illustrations, cover images, concept images, or opening videos for WeMD/WeChat articles, including multi-image coherent illustration sets.
 ---
 
 # WeMD Article Diagrams
@@ -67,7 +67,29 @@ description: Create Chinese illustrations and 15-second opening videos for WeCha
 
    Use `assets/week3_concept_diagrams.html` as the style baseline for exact text-heavy diagrams. This is not a normal alternative to the image APIs; it exists only to keep the workflow running when every API fails.
 
-6. Verify: generated PNGs and the opening MP4 exist and are nonblank, every `img.wemd.app` URL returns HTTP 200 for `image/*`, and the markdown contains no local image paths.
+6. Verify: generated PNGs, the 2.35:1 cover PNG, and the opening MP4 exist and are nonblank, every `img.wemd.app` URL returns HTTP 200 for `image/*`, and the markdown contains no local image paths.
+
+## 微信推送封面（2.35:1）
+
+Generate the WeChat push cover with Qwen Image 3.0 at 2.35:1 (`--size 1692*720`), saved as `<week-slug>_cover.png` in the week subfolder:
+
+```bash
+python scripts/generate_qwen_images.py \
+  --prompt "<封面描述>" \
+  --out-dir <article-dir>/<week-slug> \
+  --name-prefix <week-slug>_cover \
+  --index 1 \
+  --size 1692*720
+```
+
+Then rename `<week-slug>_cover.1.png` to `<week-slug>_cover.png`. The cover is uploaded in the WeChat official account editor, not embedded in the article markdown.
+
+Rules for every cover:
+
+- The content is always one person facing or working at a computer while thinking. The person can be male or female; choose per issue and vary the pose, environment, and outfit.
+- Prefer a cyber-tech feel: holographic screens, data streams, neural circuits, glowing city nights, or other imagined future scenes.
+- Each issue must use a different cover art style to avoid reader aesthetic fatigue. Pick a new style before generating, append it to every cover prompt, and record it in `## Per-issue cover style`.
+- Keep the image free of text, company logos, and sensitive business information, and only use themes already present in the article.
 
 ## Notes
 
@@ -88,6 +110,7 @@ description: Create Chinese illustrations and 15-second opening videos for WeCha
 - Dependencies: Python and `requests`; `openai>=1.0` is only needed for the Seedream fallback. Chrome or Edge are no longer required.
 - Keep all local PNGs for one article in its own week subfolder, e.g. `week3.3/`; never render them flat into the article folder.
 - Keep the opening MP4 in the same week subfolder as the images, e.g. `week5.2/week5.2_opening.mp4`.
+- WeChat cover ratio is 2.35:1 (editor preview is about 900x383); generate at 1692x720 for quality and keep the cover only in the week subfolder.
 - The upload cache `wemd_upload_cache.json` stays next to the markdown and reuses already-uploaded URLs.
 
 ## Per-issue visual style
@@ -104,3 +127,9 @@ For each new issue, pick a visually distinct background and material, then descr
 ```text
 统一使用公司透明玻璃板背景：半透明玻璃幕墙表面，隐约透出模糊的办公区灯光与桌椅轮廓，玻璃上有轻微反光与擦拭痕迹；用黑色油性马克笔手绘线稿、图表、箭头与简笔小人，辅以红、蓝、绿马克笔标注重点，字迹为手写体；整体清晰现代、商务会议室感、讲解感强。
 ```
+
+## Per-issue cover style
+
+Style history (append each new issue before generating):
+
+- week5.3: 赛博霓虹夜色数字插画，深蓝暗紫夜空、青绿与品红霓虹光带、细网格地平线、发光数据粒子，人物侧面轮廓坐在发光电脑前思考

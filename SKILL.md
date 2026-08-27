@@ -121,6 +121,7 @@ Style history (append each new issue before generating):
 - week4.x: 深绿色黑板 + 粉笔手绘科普信息图
 - week5.1: 公司透明玻璃板 + 黑色/彩色油性马克笔手绘（玻璃隐约透出办公室背景）
 - week5.2: 深蓝色工程蓝图图纸 + 白色/浅蓝针管笔手绘线稿、亮黄色重点标注
+- week6.1: 深空灰蓝全息工程图：半透明全息玻璃面板、白色细线工程图、青绿色高亮描边、数据粒子与细网格
 
 For each new issue, pick a visually distinct background and material, then describe it explicitly in every prompt. For example, week5.1 uses this style suffix:
 
@@ -133,3 +134,4 @@ For each new issue, pick a visually distinct background and material, then descr
 Style history (append each new issue before generating):
 
 - week5.3: 赛博霓虹夜色数字插画，深蓝暗紫夜空、青绿与品红霓虹光带、细网格地平线、发光数据粒子，人物侧面轮廓坐在发光电脑前思考
+- week6.1: 明亮等距全息实验室：浅灰白空间、半透明青色数据面板、白色细线工程图、暖黄点缀灯光

@@ -123,6 +123,7 @@ Style history (append each new issue before generating):
 - week5.2: 深蓝色工程蓝图图纸 + 白色/浅蓝针管笔手绘线稿、亮黄色重点标注
 - week6.1: 深空灰蓝全息工程图：半透明全息玻璃面板、白色细线工程图、青绿色高亮描边、数据粒子与细网格
 - week6.2: 暖白商务会议室数据沙盘：深胡桃木长会议桌、半透明发光数据棋盘、红金谈判筹码、白色细线流程图、暖白环境光与冷青色数据光
+- week6.3: 暗色数据中心机房排障路线图：深灰金属机柜与缠绕线缆、青绿色数据光、橙红色故障标记、白色细线排障路径、半透明日志面板
 
 For each new issue, pick a visually distinct background and material, then describe it explicitly in every prompt. For example, week5.1 uses this style suffix:
 
@@ -137,3 +138,4 @@ Style history (append each new issue before generating):
 - week5.3: 赛博霓虹夜色数字插画，深蓝暗紫夜空、青绿与品红霓虹光带、细网格地平线、发光数据粒子，人物侧面轮廓坐在发光电脑前思考
 - week6.1: 明亮等距全息实验室：浅灰白空间、半透明青色数据面板、白色细线工程图、暖黄点缀灯光
 - week6.2: 暖金商务数据沙盘电影感：深夜高层办公室玻璃幕墙、暖色台灯与冷青全息数据、人物侧对电脑思考
+- week6.3: 深夜机房运维台电影感：深灰服务器机柜、暖橙台灯与青绿全息日志、人物面对电脑排查问题

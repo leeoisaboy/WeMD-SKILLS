@@ -15,3 +15,12 @@ wemd_upload_cache.json
 Thumbs.db
 .idea/
 .vscode/
+# secrets: never commit API keys or key files
+*.csv
+*apiKey*
+*api-key*
+*api_key*
+*apikey*
+key.txt
+secrets/
+chrome_profiles/

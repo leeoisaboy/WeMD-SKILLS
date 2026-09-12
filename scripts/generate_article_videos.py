@@ -1,4 +1,4 @@
-"""Generate 15-second article opening videos with MiniMax H3, falling back to HappyHorse 1.1 T2V."""
+"""Generate 15-second article opening videos with wan3.0-video, falling back to HappyHorse 1.1 T2V."""
 import argparse
 import os
 import time
@@ -7,6 +7,21 @@ from urllib.parse import urlsplit
 
 import requests
 
+WAN_MODEL = "wan3.0-video"
+WAN_RESOLUTION = "720P"
+WAN_RATIO = "16:9"
+WAN_DURATION = 15
+
+HAPPYHORSE_MODEL = "happyhorse-1.1-t2v"
+HAPPYHORSE_RESOLUTION = "720P"
+HAPPYHORSE_RATIO = "16:9"
+HAPPYHORSE_DURATION = 15
+
+DASHSCOPE_VIDEO_ENDPOINT = (
+    "https://ws-rrk44371f2qbblbt.cn-beijing.maas.aliyuncs.com"
+    "/api/v1/services/aigc/video-generation/video-synthesis"
+)
+
 MINIMAX_MODEL = "MiniMax-H3"
 MINIMAX_CREATE_URL = "https://api.minimaxi.com/v2/video_generation"
 MINIMAX_QUERY_URL = "https://api.minimaxi.com/v2/query/video_generation/{task_id}"
@@ -14,16 +29,12 @@ MINIMAX_RESOLUTION = "768P"
 MINIMAX_RATIO = "16:9"
 MINIMAX_DURATION = 15
 
-HAPPYHORSE_MODEL = "happyhorse-1.1-t2v"
-HAPPYHORSE_ENDPOINT = (
-    "https://dashscope.aliyuncs.com"
-    "/api/v1/services/aigc/video-generation/video-synthesis"
-)
-HAPPYHORSE_RESOLUTION = "720P"
-HAPPYHORSE_RATIO = "16:9"
-HAPPYHORSE_DURATION = 15
-
-DEFAULT_PROVIDER = "minimax"
+DEFAULT_PROVIDER = "wan"
+PROVIDER_CHAIN = {
+    "wan": ["wan", "happyhorse"],
+    "minimax": ["minimax", "happyhorse"],
+    "happyhorse": ["happyhorse"],
+}
 
 
 def parse_args():
@@ -38,18 +49,18 @@ def parse_args():
     parser.add_argument(
         "--duration",
         type=int,
-        default=MINIMAX_DURATION,
-        help="Video duration in seconds (MiniMax 4-15, HappyHorse 3-15)",
+        default=WAN_DURATION,
+        help="Video duration in seconds (wan3.0-video 4-15, MiniMax 4-15, HappyHorse 3-15)",
     )
     parser.add_argument(
         "--resolution",
-        default=MINIMAX_RESOLUTION,
-        choices=["768P", "2K", "720P", "1080P"],
-        help="Resolution tier; MiniMax 768P is the 0.5 CNY/s option",
+        default=WAN_RESOLUTION,
+        choices=["720P", "1080P", "768P", "2K"],
+        help="Resolution tier; wan3.0-video and HappyHorse use 720P, MiniMax 768P",
     )
     parser.add_argument(
         "--ratio",
-        default=MINIMAX_RATIO,
+        default=WAN_RATIO,
         choices=["16:9", "9:16", "1:1", "4:3", "3:4", "4:5", "5:4", "9:21", "21:9"],
         help="Aspect ratio",
     )
@@ -59,7 +70,7 @@ def parse_args():
         default=False,
         help="Add the provider watermark",
     )
-    parser.add_argument("--seed", type=int, default=None, help="HappyHorse random seed")
+    parser.add_argument("--seed", type=int, default=None, help="Random seed")
     parser.add_argument(
         "--poll-interval",
         type=int,
@@ -74,22 +85,25 @@ def parse_args():
     )
     parser.add_argument(
         "--provider",
-        choices=["minimax", "happyhorse"],
+        choices=["wan", "minimax", "happyhorse"],
         default=DEFAULT_PROVIDER,
-        help="Video provider; MiniMax H3 is the default",
+        help="Video provider; wan3.0-video is the default",
     )
     parser.add_argument(
         "--fallback",
         action=argparse.BooleanOptionalAction,
         default=True,
-        help="Retry with HappyHorse when MiniMax fails",
+        help="Retry with the next provider in the chain when the first one fails",
     )
     parser.add_argument("--model", default=None)
     parser.add_argument("--endpoint", default=None)
     parser.add_argument(
         "--api-key",
         default=None,
-        help="Provider API key; MiniMax uses MINIMAX_API_KEY, HappyHorse uses DASHSCOPE_API_KEY",
+        help=(
+            "Provider API key; wan3.0-video and HappyHorse use DASHSCOPE_API_KEY, "
+            "MiniMax uses MINIMAX_API_KEY"
+        ),
     )
     return parser.parse_args()
 
@@ -165,9 +179,15 @@ def wait_for_minimax_video(args, task_id, key):
     )
 
 
-def build_happyhorse_payload(args):
+def dashscope_model(provider, args):
+    if args.model:
+        return args.model
+    return WAN_MODEL if provider == "wan" else HAPPYHORSE_MODEL
+
+
+def build_dashscope_payload(provider, args):
     payload = {
-        "model": args.model or HAPPYHORSE_MODEL,
+        "model": dashscope_model(provider, args),
         "input": {"prompt": args.prompt},
         "parameters": {
             "resolution": args.resolution,
@@ -181,16 +201,16 @@ def build_happyhorse_payload(args):
     return payload
 
 
-def submit_happyhorse_task(args, key):
+def submit_dashscope_task(provider, args, key):
     headers = {
         "Authorization": f"Bearer {key}",
         "Content-Type": "application/json",
         "X-DashScope-Async": "enable",
     }
     response = requests.post(
-        args.endpoint or HAPPYHORSE_ENDPOINT,
+        args.endpoint or DASHSCOPE_VIDEO_ENDPOINT,
         headers=headers,
-        json=build_happyhorse_payload(args),
+        json=build_dashscope_payload(provider, args),
         timeout=60,
     )
     if response.status_code != 200:
@@ -199,12 +219,12 @@ def submit_happyhorse_task(args, key):
     if data.get("code"):
         raise RuntimeError(f"API error: {data['code']} - {data.get('message', '')}")
     task_id = data["output"]["task_id"]
-    print(f"happyhorse task created: {task_id}")
+    print(f"{provider} task created: {task_id}")
     return task_id
 
 
-def wait_for_happyhorse_video(args, task_id, key):
-    parts = urlsplit(args.endpoint or HAPPYHORSE_ENDPOINT)
+def wait_for_dashscope_video(provider, args, task_id, key):
+    parts = urlsplit(args.endpoint or DASHSCOPE_VIDEO_ENDPOINT)
     task_url = f"{parts.scheme}://{parts.netloc}/api/v1/tasks/{task_id}"
     headers = {"Authorization": f"Bearer {key}"}
     deadline = time.monotonic() + args.timeout
@@ -214,7 +234,7 @@ def wait_for_happyhorse_video(args, task_id, key):
         data = response.json()
         output = data.get("output", {})
         status = output.get("task_status", "UNKNOWN")
-        print(f"happyhorse task status: {status}")
+        print(f"{provider} task status: {status}")
         if status == "SUCCEEDED":
             video_url = output.get("video_url")
             if not video_url:
@@ -259,29 +279,27 @@ def run_minimax(args):
     download_video(args, video_url)
 
 
-def run_happyhorse(args):
-    if not 3 <= args.duration <= 15:
-        raise RuntimeError("HappyHorse accepts video duration between 3 and 15 seconds")
+def run_dashscope(provider, args):
+    if not 4 <= args.duration <= 15:
+        raise RuntimeError(f"{provider} accepts video duration between 4 and 15 seconds")
     if args.resolution not in ("720P", "1080P"):
-        raise RuntimeError("HappyHorse supports resolution 720P or 1080P")
-    key = get_provider_key("happyhorse", args.api_key)
-    task_id = submit_happyhorse_task(args, key)
-    video_url = wait_for_happyhorse_video(args, task_id, key)
+        raise RuntimeError(f"{provider} supports resolution 720P or 1080P")
+    key = get_provider_key(provider, args.api_key)
+    task_id = submit_dashscope_task(provider, args, key)
+    video_url = wait_for_dashscope_video(provider, args, task_id, key)
     download_video(args, video_url)
 
 
 def main():
     args = parse_args()
-    providers = [args.provider]
-    if args.provider == "minimax" and args.fallback:
-        providers.append("happyhorse")
+    providers = PROVIDER_CHAIN[args.provider] if args.fallback else [args.provider]
     last_error = None
     for provider in providers:
         try:
             if provider == "minimax":
                 run_minimax(args)
             else:
-                run_happyhorse(args)
+                run_dashscope(provider, args)
             return
         except Exception as exc:
             last_error = exc

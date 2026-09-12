@@ -1,4 +1,4 @@
 interface:
   display_name: "WeMD Article Diagrams"
-  short_description: "Qwen Image 3.0 Chinese illustrations, MiniMax H3 opening videos, and img.wemd.app uploads"
-  default_prompt: "Generate Chinese article illustrations with Alibaba Cloud Qwen Image 3.0, use Seedream 5.0 as the first image fallback, use MiniMax H3 for opening videos with HappyHorse 1.1 T2V as the video fallback, use HTML diagrams only as the last resort, save images into per-week folders, and upload them to img.wemd.app for WeMD articles."
+  short_description: "Qwen Image 3.0 board illustrations, wan3.0-video opening videos, img.wemd.app uploads"
+  default_prompt: "Generate board-style Chinese illustrations with Alibaba Cloud Qwen Image 3.0, a 2.35:1 WeChat cover, and a 15-second wan3.0-video opening video whose theme line fades in at the end, using Seedream 5.0 as the first image fallback and HappyHorse 1.1 T2V as the video fallback, save media into per-week folders, and upload images to img.wemd.app for WeMD articles."

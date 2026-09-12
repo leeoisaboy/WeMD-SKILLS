@@ -7,7 +7,7 @@ from pathlib import Path
 import requests
 
 DEFAULT_MODEL = "qwen-image-3.0"
-DEFAULT_ENDPOINT = "https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation"
+DEFAULT_ENDPOINT = "https://ws-rrk44371f2qbblbt.cn-beijing.maas.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation"
 DEFAULT_SIZE = "1024*1024"
 
 

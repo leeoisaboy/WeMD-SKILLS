@@ -82,6 +82,18 @@ description: Create Chinese blackboard-style illustrations, bright action-led pe
 
 6. Verify: generated PNGs, the 2.35:1 cover PNG, and the opening MP4 exist and are nonblank, every `img.wemd.app` URL returns HTTP 200 for `image/*`, and the markdown contains no local image paths.
 
+7. **Post-publish closing action — Sync latest weekly note to GitHub Profile (`leeoisaboy/leeoisaboy`)**:
+   After publishing the article in the WeChat Official Account editor and obtaining its permanent URL (`https://mp.weixin.qq.com/s/...`), run:
+
+   ```bash
+   python scripts/update_github_profile.py \
+     --url "https://mp.weixin.qq.com/s/<permanent-id>" \
+     --md <article.md> \
+     --summary "<一句话核心观点>"
+   ```
+
+   It automatically extracts the H1 title (and summary if `--summary` is omitted) from `<article.md>`, inserts the new entry at the top of the `<!-- WEEKLY_NOTES_START --> ... <!-- WEEKLY_NOTES_END -->` block in `leeoisaboy/leeoisaboy/README.md`, keeps only the latest 5 articles (automatically dropping the 6th), and commits & pushes via GitHub API (`GITHUB_TOKEN` env var or `gh auth login`) or `--local-repo <path>`. Never hardcode any GitHub token in scripts or prompts.
+
 ## 微信推送封面（2.35:1）
 
 Generate the WeChat push cover with Qwen Image 3.0 at 2.35:1 (`--size 1692*720`), saved as `<week-slug>_cover.png` in the week subfolder:

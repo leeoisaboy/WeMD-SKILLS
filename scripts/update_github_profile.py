@@ -118,6 +118,15 @@ def update_weekly_notes_block(
         new_entry += f" — {safe_summary}"
 
     all_lines = [new_entry] + existing_lines
+
+    def entry_date(line: str) -> str:
+        match = re.match(r"^- `(\d{4}-\d{2}-\d{2})`", line)
+        return match.group(1) if match else ""
+
+    # Dates may arrive out of publication order during bulk backfills.
+    # Keep the section ordered newest-first regardless of insertion order.
+    all_lines.sort(key=entry_date, reverse=True)
+
     top_lines = all_lines[: max(1, visible_items)]
     archived_lines = all_lines[max(1, visible_items) :]
 

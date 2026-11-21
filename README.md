@@ -44,7 +44,8 @@ WeMD-SKILLS/
 │   ├── generate_qwen_images.py      # Qwen Image 3.0 文生图
 │   ├── generate_seedream_images.py  # Seedream 5.0 备用生图
 │   ├── render_html_diagrams.py      # HTML 透明概念图渲染（最后兜底）
-│   └── upload_wemd_images.py        # 上传 img.wemd.app 并替换链接
+│   ├── upload_wemd_images.py        # 上传 img.wemd.app 并替换链接
+│   └── update_github_profile.py     # 发布后将周记同步到 GitHub Profile README
 ├── requirements.txt
 ├── .gitignore
 └── README.md
@@ -144,6 +145,21 @@ python scripts/render_html_diagrams.py \
 ```bash
 python scripts/upload_wemd_images.py week4.2.md
 ```
+
+### 7. 同步周记到 GitHub Profile
+
+公众号发布后，将永久链接同步到 Profile README 的周记区块。脚本会去重、按发布日期降序排列、保留最新 5 篇，并把更早文章折叠归档：
+
+```bash
+python scripts/update_github_profile.py \
+  --url "https://mp.weixin.qq.com/s/<permanent-id>" \
+  --title "<文章标题>" \
+  --summary "<一句话核心观点>" \
+  --date 2026-11-21 \
+  --local-repo <path-to-leeoisaboy-profile-repo>
+```
+
+不使用本地仓库时，可通过 `GITHUB_TOKEN` 或 `gh auth login` 调用 GitHub API。不要将 Token 写入脚本或仓库。
 
 ## 安全提示
 

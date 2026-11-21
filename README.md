@@ -1,4 +1,10 @@
 <p align="center">
+  <a href="https://github.com/leeoisaboy/WeMD-SKILLS">
+    <img src="docs/assets/title_banner.zh.png" alt="WeMD-SKILLS 微信公众号多模态配图、片头视频与主页归档工作台" />
+  </a>
+</p>
+
+<p align="center">
   <img alt="Codex Skill" src="https://img.shields.io/badge/Codex_Skill-WeMD_Workflow-0ea5e9?style=flat-square">
   <img alt="Image" src="https://img.shields.io/badge/Image-Qwen_3.0_%2F_Seedream_5.0-2b9c94?style=flat-square">
   <img alt="Video" src="https://img.shields.io/badge/Video-wan3.0--video_%2F_HappyHorse-7b6bb0?style=flat-square">

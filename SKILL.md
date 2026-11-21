@@ -92,7 +92,7 @@ description: Create Chinese blackboard-style illustrations, bright action-led pe
      --summary "<一句话核心观点>"
    ```
 
-   It automatically extracts the H1 title (and summary if `--summary` is omitted) from `<article.md>`, inserts the new entry at the top of the `<!-- WEEKLY_NOTES_START --> ... <!-- WEEKLY_NOTES_END -->` block in `leeoisaboy/leeoisaboy/README.md`, keeps only the latest 5 articles (automatically dropping the 6th), and commits & pushes via GitHub API (`GITHUB_TOKEN` env var or `gh auth login`) or `--local-repo <path>`. Never hardcode any GitHub token in scripts or prompts.
+   It automatically extracts the H1 title (and summary if `--summary` is omitted) from `<article.md>`, inserts the new entry at the top of the `<!-- WEEKLY_NOTES_START --> ... <!-- WEEKLY_NOTES_END -->` block in `leeoisaboy/leeoisaboy/README.md`, keeps the latest 5 articles directly visible while automatically folding all older articles into a collapsible `<details>` archive (so nothing is ever lost), and commits & pushes via GitHub API (`GITHUB_TOKEN` env var or `gh auth login`) or `--local-repo <path>`. Never hardcode any GitHub token in scripts or prompts.
 
 ## 微信推送封面（2.35:1）
 

@@ -84,9 +84,9 @@ def update_weekly_notes_block(
     title: str,
     url: str,
     summary: str,
-    max_items: int = DEFAULT_MAX_ITEMS,
+    visible_items: int = DEFAULT_MAX_ITEMS,
 ) -> str:
-    """Insert a new weekly note at the top of the marker block and keep at most `max_items`."""
+    """Insert a new weekly note at the top; keep latest `visible_items` visible and archive all older ones in <details>."""
     if START_MARKER not in readme_text or END_MARKER not in readme_text:
         raise ValueError(
             f"Could not find {START_MARKER} ... {END_MARKER} in README.md. "
@@ -101,6 +101,7 @@ def update_weekly_notes_block(
     if not match:
         raise ValueError("Failed to parse WEEKLY_NOTES marker block.")
 
+    # Collect ALL existing bullet items (both visible and inside <details>)
     existing_lines = [
         ln.strip()
         for ln in match.group(2).splitlines()
@@ -116,8 +117,20 @@ def update_weekly_notes_block(
     if safe_summary:
         new_entry += f" — {safe_summary}"
 
-    updated_lines = [new_entry] + existing_lines[: max(0, max_items - 1)]
-    replacement = match.group(1) + "\n".join(updated_lines) + "\n" + END_MARKER
+    all_lines = [new_entry] + existing_lines
+    top_lines = all_lines[: max(1, visible_items)]
+    archived_lines = all_lines[max(1, visible_items) :]
+
+    body_parts = ["\n".join(top_lines)]
+    if archived_lines:
+        body_parts.append(
+            "\n<details>\n"
+            f"<summary>📚 展开查看全部往期周记（共 {len(archived_lines)} 篇）</summary>\n\n"
+            + "\n".join(archived_lines)
+            + "\n\n</details>"
+        )
+
+    replacement = match.group(1) + "\n".join(body_parts) + "\n" + END_MARKER
     return readme_text[: match.start()] + replacement + readme_text[match.end() :]
 
 

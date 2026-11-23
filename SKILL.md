@@ -1,6 +1,6 @@
 ---
 name: wemd-article-diagrams
-description: Create Chinese blackboard-style illustrations, bright action-led per-issue 2.35:1 WeChat cover images, and 15-second opening videos for WeChat/WeMD markdown articles with Alibaba Cloud Qwen Image 3.0, wan3.0-video as the primary video model, HappyHorse 1.1 T2V as the video fallback, Seedream 5.0 as the first image fallback, and HTML diagrams only as the last resort. Every illustration prompt must be a hand-drawn board (板书) with both drawings and Chinese text, and one board material per issue. Covers default to a light, optimistic palette and show a person performing a concrete action from the article, not a generic contemplative portrait. Save media into per-week folders, upload images to the official img.wemd.app image host, replace local image paths with https://img.wemd.app/... URLs, and place generated videos at the top of the article. Use when generating article illustrations, cover images, concept images, or opening videos for WeMD/WeChat articles, including multi-image coherent illustration sets.
+description: Create Chinese blackboard-style illustrations, diverse artistic per-issue 2.35:1 WeChat cover images, and 15-second opening videos for WeChat/WeMD markdown articles with Alibaba Cloud Qwen Image 3.0, wan3.0-video as the primary video model, HappyHorse 1.1 T2V as the video fallback, Seedream 5.0 as the first image fallback, and HTML diagrams only as the last resort. Every illustration prompt must be a hand-drawn board (板书) with both drawings and Chinese text, and one board material per issue. Covers embrace wide stylistic and subject freedom (light or dark, abstract, sci-fi, futuristic, historical, figurative, animal, symbolic, etc.) as long as the artistic imagery conveys the article's core thinking and contains no explanatory text. Save media into per-week folders, upload images to the official img.wemd.app image host, replace local image paths with https://img.wemd.app/... URLs, and place generated videos at the top of the article. Use when generating article illustrations, cover images, concept images, or opening videos for WeMD/WeChat articles, including multi-image coherent illustration sets.
 ---
 
 # WeMD Article Diagrams
@@ -111,13 +111,11 @@ Then rename `<week-slug>_cover.1.png` to `<week-slug>_cover.png`. The cover is u
 
 Rules for every cover:
 
-- Build the cover around a concrete action drawn from the article. The person may assemble a service chain, install a device, compare options, walk through a process, present a plan, demonstrate a prototype, or hand something to someone else. Show them mid-action, with a clear gesture and direction; do not default to sitting at a computer with a hand on the chin.
-- Use a bright, airy base by default: warm white, ivory, pale mint, sky blue, coral, soft peach, and warm gold. Keep the subject and key objects clearly separated from the background. Avoid near-black scenes, heavy shadows, and low-key night lighting unless the article explicitly demands it.
-- Carry the article's central metaphor in one readable focal scene. At WeChat thumbnail size, the viewer should quickly understand who is acting and what they are changing, connecting, or delivering.
-- Prefer a product-realistic future feel with subtle holographic data, translucent service flows, prototypes, or connected devices. Use cyber-tech as a bright accent, not as a dark default.
-- The person can be male or female; vary age, pose, environment, and outfit across issues. Avoid repeating the same desk, side profile, or contemplative pose.
-- Each issue must use a different cover art style to avoid reader aesthetic fatigue. Pick a new style before generating, append it to every cover prompt, and record it in `## Per-issue cover style`.
-- Keep the image free of text, company logos, and sensitive business information, and only use themes already present in the article. Simplify the number of props so the main action remains legible.
+- Embrace wide artistic randomness and variety across issues: do NOT lock covers to a bright/white palette or a human portrait. Light, dark, high-contrast, muted, surreal, minimalist, painterly, cinematic, or sculptural palettes are all welcome.
+- Subject matter is completely open: it can be abstract, sci-fi, futuristic, historical, architectural, mechanical, natural, animal, symbolic, still-life, or figurative (human). Pick whatever visual metaphor best captures the article's core thinking.
+- The artistry must convey the article's central insight or tension in one readable, memorable focal composition at WeChat thumbnail size (2.35:1).
+- Each issue must use a different cover art style and subject direction to avoid reader aesthetic fatigue. Pick a fresh style before generating, append it to the cover prompt, and record it in `## Per-issue cover style`.
+- Keep the cover completely free of explanatory text, labels, annotations (unlike the in-article board illustrations), company logos, and sensitive business information. Only use themes already present in the article.
 
 ## Notes
 
@@ -190,6 +188,8 @@ Style history (append each new issue before generating):
 - week15.1: 浅蓝白科普信息图板书：白色磨砂卡片与浅蓝网格背景、深海军蓝手写标题与线稿、珊瑚橙与青绿重点标注、圆角信息卡与柔和阴影；固定角色是一只棕白相间的阿拉斯加幼犬，拿放大镜做检索，表情认真友好
 - week17.2: 深蓝灰板岩板书：整块天然深蓝灰板岩、细密层理与石粉、四角做旧黄铜夹扣；白色石笔手写中文标题与关键词，浅赭红与铜绿矿物颜料圈画重点，浅灰细线绘制流程与箭头，斜射工作室顶光
 - week18.1: 浅灰白搪瓷金属板书：温润象牙白搪瓷钢板、黑色窄包边与四角黄铜铆钉、极细搪瓷颗粒和柔和反光；深海军蓝马克笔手写中文标题与关键词，朱红与钴蓝圈画重点，浅灰细线绘制流程、箭头与图形，局部以磁吸色块固定纸片
+- week18.2: 浅砂金拉丝铝板板书：香槟色拉丝铝板与浅灰工程网格、四角黑色内六角螺栓、半透明胶带与回形针夹纸；黑色细头马克笔手写中文标题与关键词，档案蓝与印章红圈画重点，浅灰细线绘制流程、箭头、表格与图标
+- week19.1: 浅松木纹软木钉板板书：温润浅米褐细颗粒软木板面与窄胡桃木框、黄铜图钉与麻线固定米白卡片；深咖色细头马克笔手写中文标题与关键词，松林绿与朱橙色马克笔圈画重点，炭灰细线手绘流程、齿轮、时间轴与图标，柔和暖白工作室顶光
 
 For each new issue, pick a visually distinct background and material, then describe it explicitly in every prompt. For example, week5.1 uses this style suffix:
 
@@ -201,7 +201,7 @@ For each new issue, pick a visually distinct background and material, then descr
 
 Style history (append each new issue before generating):
 
-From week17.2 onward, covers default to a bright, open palette and an action-led composition. The earlier dark or contemplative entries below remain as history, not as the default reference.
+From week19.1 onward, covers are no longer restricted to bright palettes or human subjects—any artistic style and subject (light or dark, abstract, sci-fi, futuristic, historical, animal, symbolic, figurative, etc.) is encouraged as long as it conveys the article's core thinking without any explanatory text.
 
 - week5.3: 赛博霓虹夜色数字插画，深蓝暗紫夜空、青绿与品红霓虹光带、细网格地平线、发光数据粒子，人物侧面轮廓坐在发光电脑前思考
 - week6.1: 明亮等距全息实验室：浅灰白空间、半透明青色数据面板、白色细线工程图、暖黄点缀灯光
@@ -219,4 +219,6 @@ From week17.2 onward, covers default to a bright, open palette and an action-led
 - week15.1: 浅蓝白科普信息图电影感：白色磨砂工作台与浅蓝网格背景、深海军蓝线稿、珊瑚橙与青绿数据光，阿拉斯加幼犬拿放大镜面对音频波形与两阶段检索漏斗，干净明亮
 - week17.2: 明亮暖白产品共创工作室：象牙白与浅薄荷绿空间、珊瑚橙与暖金点缀、亚裔女性产品经理站在宽桌前把发光硬件模块接入六段服务链，周围有透明小屋、随身终端、人工坐席与契约卡片，明亮侧窗自然光与轻微全息投影
 - week18.1: 明亮晨光城市微缩战略台：浅木长桌、半透明社区沙盘、珊瑚橙发光多米诺骨牌与浅青暖金玻璃片，男性产品经理俯身推倒第一张骨牌，浅蓝白晨光工作室与远景城市
+- week18.2: 明亮日光建筑师规划馆：象牙白与浅香槟金现代规划厅、落地窗自然日光、浅灰蓝拉丝金属长桌，年轻亚裔女性产品经理站立俯身将档案蓝与暖金色半透明发光丝带从外围玻璃模块收拢系向中央枢纽
+- week19.1: 深邃暗金古典机械天球仪雕塑：午夜靛蓝与丝绒黑空间、暖琥珀金逆光与冷青光丝，中央是一座黄铜与半透明玻璃构成的精密动态天球仪，三层不同尺寸与转速的独立环轨在各自轴线上运转并汇合于发光金核，纤细金色光丝如人体脉络般向外舒展，边缘漂浮着剥离退场的暗淡旧碎片，无人物无文字
 
